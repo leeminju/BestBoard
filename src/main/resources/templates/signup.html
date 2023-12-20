@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <title>회원가입 페이지</title>
+    <script>
+        let check = false;
+
+        $(document).ready(function () {
+            $("#nickname").on("property-change change paste input", function () {
+                if(check){
+                    check = false;
+                    $('#complete_text').hide();
+                }
+            });
+        });
+
+        function nicknameCheck() {
+            let nickname = $('#nickname').val();
+            $.ajax({
+                    type: 'GET',
+                    url: `/api/users/signup/nickname?nickname=${nickname}`,
+                    contentType: 'application/json',
+                    success: function (response) {
+                        alert(response['responseMessage']);
+                        check = true;
+                        $('#complete_text').show();
+                    },
+                    error(error, status, request) {
+                        alert(error['responseJSON']['responseMessage']);
+                        check = false;
+                    }
+                }
+            );
+        }
+
+        function signup() {
+            let nickname = $('#nickname').val();
+            let password = $('#password').val();
+            let confirm_password = $('#confirm_password').val();
+
+            let data = {
+                'nickname': nickname,
+                'password': password,
+                'confirmPassword': confirm_password,
+                'check': check
+            };
+
+            $.ajax({
+                    type: 'POST',
+                    url: '/api/users/signup',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        alert(response['responseMessage']);
+                        window.location.href = '/api/users/login-page';
+                    },
+                    error(error, status, request) {
+                        alert(error['responseJSON']['responseMessage']);
+                    }
+                }
+            );
+        }
+    </script>
+</head>
+<body>
+<div id="login-form">
+    <div id="login-title">Sign up MyBoard</div>
+
+
+    <div class="login-id-label">nickname</div>
+    <input type="text" id="nickname" placeholder="nickname" class="login-input-box">
+    <div id="complete_text" style="display:none; color : red">완료</div>
+    <button onclick="nicknameCheck()" id="check-button">중복 확인</button>
+
+
+    <div class="login-id-label">Password</div>
+    <input type="password" id="password" placeholder="Password" class="login-input-box">
+
+    <div class="login-id-label">Confirm Password</div>
+    <input type="password" id="confirm_password" placeholder="Confirm Password" class="login-input-box">
+
+    <button onclick="signup()" id="login-id-submit">회원 가입</button>
+
+</div>
+</body>
+</html>
