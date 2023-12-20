@@ -14,6 +14,7 @@ public class PostResponseDto {
     private String title;
     private String nickname;
     private String contents;
+    private String image;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private boolean finished;
@@ -25,5 +26,6 @@ public class PostResponseDto {
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
         this.nickname = post.getUser().getNickname();
+        this.image = post.getImage();
     }
 }

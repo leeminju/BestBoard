@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j(topic = "post 검증")
@@ -21,9 +23,11 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("/posts")
-    public ResponseEntity<CustomResponseEntity> createPost(@RequestBody @Valid PostRequestDto requestDto,
-                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postService.createPost(requestDto, userDetails.getUser());
+    public ResponseEntity<CustomResponseEntity> createPost(
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestPart("data") @Valid PostRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        postService.createPost(requestDto, userDetails.getUser(),image);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CustomResponseEntity(
                         "게시글 작성 완료",

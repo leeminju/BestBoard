@@ -1,8 +1,16 @@
 const host = 'http://' + window.location.host;
 let login_user;
 
+var imageFile;
+
+
 // 화면 시작하자마자
 $(document).ready(function () {
+    // 첨부파일을 변경할때 마다 실행되는 이벤트
+    $("#create_image").on("change", function (event) {
+        imageFile = event.target.files[0];
+        console.log(imageFile);
+    });
 
     authorizationCheck();//인가
     addPostCard();//게시글 카드 추가
@@ -73,14 +81,19 @@ function addPostCard() {
                 let contents = post['contents'];
                 let createdAt = post['createdAt'];
                 let nickname = post['nickname'];
+                let image = post['image'];
+
+                if (image === null) {
+                    image = "images/default.jpg";
+                }
 
                 let html =
                     `<div onclick="showDetails('${id}')" style="transition:transform 0.3s ease-in-out" class="col" data-bs-toggle="modal" data-bs-target="#PostDetailsModal">
-                     <img src="images/default.jpg" class="card-img-top" alt="...">
+                     <img src="${image}" class="card-img-top" alt="..." style="object-fit:contain;height:400px;width: 100%">
                     </a>
                     <div class="member_content">
                     <h5>${title}</h5>
-                        <h2>${nickname}</h2>
+                    <h5>${nickname}</h5>
                     <h5>${createdAt}</h5>
                     </div> 
                    </div>`
@@ -99,6 +112,13 @@ function addPostCard() {
 
 //게시글 작성
 function createPost(username) {
+    let formData = new FormData();
+    console.log(imageFile);
+    if (!imageFile) {
+        formData.append('image', null);
+    } else {
+        formData.append('image', imageFile);
+    }
     let title = $('#create_title').val();
     let contents = $('#create_contents').val().replace("\r\b", "<br>");//textarea에서 엔터-> <br>로 변환
 
@@ -106,17 +126,22 @@ function createPost(username) {
         'title': title,
         'contents': contents
     };
+    formData.append("data", new Blob([JSON.stringify(data)], {type: "application/json"}));
+
 
     $.ajax({
             type: 'POST',
             url: '/api/posts',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
+            data: formData,
+            contentType: false,
+            processData: false,
             success: function (response) {
+                console.log(response);
                 alert(response['responseMessage']);
                 window.location.reload();
             },
             error(error, status, request) {
+                console.log(error);
                 alert(error['responseJSON']['responseMessage']);
             }
         }
@@ -136,6 +161,7 @@ function showDetails(id) {
             let nickname = response['nickname'];
             let contents = response['contents'];
             let createdAt = response['createdAt'];
+            let image = response['image'];
 
             contents = contents.replaceAll("<br>", "\r\n");
 
@@ -143,12 +169,14 @@ function showDetails(id) {
             $('#response_contents').text(contents);
             $('#response_nickname').text(nickname);
             $('#response_createdAt').text(createdAt);
+            $('#response_image').attr("src", image);
 
             $('#delete_btn').val(id);
             $('#update_btn').val(id);
 
             $('#edit_title').val(title);
             $('#edit_contents').val(contents);
+            $('#edit_image').val(image);
         }
     })
     showComment(id);

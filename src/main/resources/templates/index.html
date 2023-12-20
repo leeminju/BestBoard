@@ -46,8 +46,10 @@
                         aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <input th:class="form-control" type="file" id="create_image">
                 <input type="text" class="form-control" id="create_title" placeholder="제목">
                 <textarea class="form-control" id="create_contents" placeholder="내용" rows="3"></textarea>
+
             </div>
             <div class="modal-footer">
                 <button onclick="win_reload()" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
@@ -73,7 +75,8 @@
                     <span class="writer" id="response_nickname">작성자</span>
                     <span id="response_createdAt" style="float: right">작성일</span>
                 </div>
-                <textarea class="form-control" id="response_contents" placeholder="내용" rows="2" disabled></textarea>
+                <img src="" id="response_image" style="object-fit:contain;height:400px;width: 100%;margin: 10px 0px 10px 0px">
+                <textarea class="form-control" id="response_contents" placeholder="내용" rows="5" disabled></textarea>
                 <h5>Comments</h5>
                 <div class="row d-flex justify-content-center">
                     <div id="commentarea" class="col-md-8 col-lg-6">
@@ -111,7 +114,7 @@
                 <input type="text" class="form-control" id="edit_title" placeholder="제목">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
+            <input th:class="form-control" type="file" id="edit_image">
             <textarea class="form-control" id="edit_contents" placeholder="내용" rows="3"></textarea>
             <div class="modal-footer">
                 <button class="btn btn-primary" data-bs-target="#PostDetailsModal" data-bs-toggle="modal">Back</button>

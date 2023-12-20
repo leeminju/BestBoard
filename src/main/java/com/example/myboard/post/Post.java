@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,9 @@ public class Post extends Timestamped {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String contents;
 
+    @Column
+    private String image;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -36,21 +40,22 @@ public class Post extends Timestamped {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> commentList = new ArrayList<>();
 
-    public Post(PostRequestDto todoRequestDto) {
-        super();
-        this.title = todoRequestDto.getTitle();
-        this.contents = todoRequestDto.getContents();
+    public Post(PostRequestDto requestDto, User user) {
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+        this.user = user;
+    }
+
+    public Post(PostRequestDto requestDto, User user, String imageUrl) {
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+        this.user = user;
+        this.image = imageUrl;
     }
 
     public void addCommentList(Comment comment) {
         commentList.add(comment);
         comment.addPost(this);// 외래 키(연관 관계) 설정
-    }
-
-    public Post(PostRequestDto requestDto, User user) {
-        this.title = requestDto.getTitle();
-        this.contents = requestDto.getContents();
-        this.user = user;
     }
 
     public void update(PostRequestDto requestDto) {
