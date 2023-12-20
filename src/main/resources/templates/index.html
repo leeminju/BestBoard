@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="/js/basic.js"></script>
+    <title>게시판 </title>
+</head>
+<body>
+
+<div class="header" style="position:relative;">
+    <div id="header-title-login-user">
+        <span id="nickname"></span> 님의 게시판
+    </div>
+    <a id="login-text" href="javascript:logout()">
+        로그아웃
+    </a>
+    <button class="btn btn-outline-dark" style="margin-top: 10px" data-bs-toggle="modal"
+            data-bs-target="#PostWriteModal">
+        게시글 작성
+    </button>
+</div>
+
+<div class="modal fade" id="PostWriteModal" data-bs-backdrop="static" aria-hidden="true"
+     aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">게시글 작성</h1>
+                <button onclick="win_reload()" type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="create_title" placeholder="제목">
+                <textarea class="form-control" id="create_contents" placeholder="내용" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button onclick="win_reload()" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                </button>
+                <button id="create_btn" class="btn btn-light" onclick="createPost()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="PostDetailsModal" data-bs-backdrop="static" aria-hidden="true"
+     aria-labelledby="exampleModalToggleLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="response_title">제목</h1>
+                <button onclick="win_reload()" type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="info">
+                    <span class="writer" id="response_nickname">작성자</span>
+                    <span id="response_createdAt" style="float: right">작성일</span>
+                </div>
+                <textarea class="form-control" id="response_contents" placeholder="내용" rows="2" disabled></textarea>
+                <h5>Comments</h5>
+                <div class="row d-flex justify-content-center">
+                    <div id="commentarea" class="col-md-8 col-lg-6">
+                        <div class="card shadow-0 border" style="background-color: #f0f2f5;">
+                            <div class="form-outline">
+                                <textarea class="input_comment" id="comment_text" placeholder="Type comment..."
+                                          rows="3"></textarea>
+                                <label onclick="create_Comment()" class="form-label" for="comment_text">+ Add a
+                                    comment</label>
+                            </div>
+                            <div id="comment-card" class="card-body">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="win_reload()" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close
+                </button>
+                <button id="delete_btn" onclick="deletePost()" type="button" class="btn btn-danger">Remove
+                </button>
+                <button class="btn btn-primary" data-bs-target="#EditModal" data-bs-toggle="modal">Edit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="EditModal" data-bs-backdrop="static" aria-hidden="true"
+     aria-labelledby="exampleModalToggleLabel2"
+     tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <input type="text" class="form-control" id="edit_title" placeholder="제목">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <textarea class="form-control" id="edit_contents" placeholder="내용" rows="3"></textarea>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-target="#PostDetailsModal" data-bs-toggle="modal">Back</button>
+                <button id="update_btn" class="btn btn-danger" onclick="updatePost()">Save</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="win_close()">Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="mycards">
+    <div id="card" class="row row-cols-1 row-cols-md-4 g-4">
+
+    </div>
+</div>
+</body>
+
