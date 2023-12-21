@@ -4,8 +4,13 @@ import com.example.myboard.global.exception.ErrorCode;
 import com.example.myboard.global.exception.RestApiException;
 import com.example.myboard.post.Post;
 import com.example.myboard.post.PostRepository;
+import com.example.myboard.post.PostResponseDto;
 import com.example.myboard.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,19 +34,23 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
 
-    public List<CommentResponseDto> getComments(Long postId) {
+    public Page<CommentResponseDto> getComments(Long postId, int page, int size, String sortBy, boolean isAsc) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new RestApiException(ErrorCode.NOT_FOUND_POST)
         );
 
-        List<Comment> commentList = commentRepository.findByPostOrderByCreatedAtDesc(post);//댓글 작성일 기준 내림차순 정렬
-        List<CommentResponseDto> responseDtoList = new ArrayList<>();
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
-        for (Comment comment : commentList) {
-            responseDtoList.add(new CommentResponseDto(comment));
-        }
-
-        return responseDtoList;
+        return commentRepository.getCommentsByPostWithPage(postId,pageable).map(CommentResponseDto::new);
+//        List<Comment> commentList = commentRepository.findByPostOrderByCreatedAtDesc(post);//댓글 작성일 기준 내림차순 정렬
+//        List<CommentResponseDto> responseDtoList = new ArrayList<>();
+//
+//        for (Comment comment : commentList) {
+//            responseDtoList.add(new CommentResponseDto(comment));
+//        }
+        //   return responseDtoList;
     }
 
     public CommentResponseDto getComment(Long commentId) {

@@ -4,6 +4,7 @@ import com.example.myboard.global.response.CustomResponseEntity;
 import com.example.myboard.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,8 +33,12 @@ public class CommentController {
 
     //게시글에 해당되는 댓글 모두 보기
     @GetMapping("/posts/{postId}/comments")
-    public List<CommentResponseDto> getComments(@PathVariable Long postId) {
-        return commentService.getComments(postId);
+    public Page<CommentResponseDto> getComments(@PathVariable Long postId,
+                                                @RequestParam("page") int page,
+                                                @RequestParam("size") int size,
+                                                @RequestParam("sortBy") String sortBy,
+                                                @RequestParam("isAsc") boolean isAsc) {
+        return commentService.getComments(postId,page-1,size,sortBy,isAsc);
     }
 
     //댓글 1개 보기

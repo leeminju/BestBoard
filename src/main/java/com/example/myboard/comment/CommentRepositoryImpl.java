@@ -1,5 +1,6 @@
-package com.example.myboard.post;
+package com.example.myboard.comment;
 
+import com.example.myboard.post.Post;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -17,38 +18,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
+@Slf4j
 @RequiredArgsConstructor
-public class PostRepositoryImpl implements PostRepositoryCustom {
-
+public class CommentRepositoryImpl implements CommentRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Post> getPostsWithKeyword(String keyword) {
-        QPost post = QPost.post;
-        return jpaQueryFactory.selectFrom(post)
-                .where(post.contents.contains(keyword)
-                        .or(post.title.contains(keyword))
-                ).fetch();
+    public Page<Comment> getCommentsByPostWithPage(Long postId, Pageable pageable) {
+        QComment comment = QComment.comment;
 
-    }
-
-    @Override
-    public Page<Post> getPostsWithPage(Pageable pageable) {
-        QPost post = QPost.post;
-
-        var query = jpaQueryFactory.selectFrom(post)
+        var query = jpaQueryFactory.selectFrom(comment)
+//                .where(comment.post.id.eq(postId))
                 .offset(pageable.getOffset())// 조회하려고 하는 페이지가 과거일 수록 느려짐.
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifier(pageable.getSort())
                         .stream().toArray(OrderSpecifier[]::new)
                 );
 
-        var posts = query.fetch();
+        var comments = query.fetch();
+        log.info("댓글 수" + comments.size());
+        for (int i = 0; i < comments.size(); i++) {
+            log.info(comments.get(i).toString());
+        }
         long totalSize = jpaQueryFactory.select(Wildcard.count)
-                .from(post)
+                .from(comment)
+                .where(comment.post.id.eq(postId))
                 .fetch().get(0);
-
-        return PageableExecutionUtils.getPage(posts, pageable, () -> totalSize);
+        log.info("전체 수" + totalSize);
+        return PageableExecutionUtils.getPage(comments, pageable, () -> totalSize);
     }
 
     @Override
@@ -58,9 +55,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         sort.stream().forEach(order -> {
             Order direction = order.isAscending() ? Order.ASC : Order.DESC;
             String prop = order.getProperty();
-            System.out.println("prop : " + prop);
-            PathBuilder orderByExpression = new PathBuilder(Post.class, "post");
-            System.out.println("orderByExpression.get(prop) = " + orderByExpression.get(prop));
+            PathBuilder orderByExpression = new PathBuilder(Comment.class, "comment");
             orders.add(new OrderSpecifier(direction, orderByExpression.get(prop)));
         });
         return orders;
