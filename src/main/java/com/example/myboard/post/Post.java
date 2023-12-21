@@ -58,9 +58,10 @@ public class Post extends Timestamped {
         comment.addPost(this);// 외래 키(연관 관계) 설정
     }
 
-    public void update(PostRequestDto requestDto) {
+    public void update(PostRequestDto requestDto,String image) {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
+        this.image = image;
     }
 
     public void addUser(User user) {

@@ -1,7 +1,7 @@
 const host = 'http://' + window.location.host;
-let login_user;
 
 var imageFile;
+var updateFile;
 
 
 // 화면 시작하자마자
@@ -9,7 +9,10 @@ $(document).ready(function () {
     // 첨부파일을 변경할때 마다 실행되는 이벤트
     $("#create_image").on("change", function (event) {
         imageFile = event.target.files[0];
-        console.log(imageFile);
+    });
+
+    $("#edit_image").on("change", function (event) {
+        updateFile = event.target.files[0];
     });
 
     authorizationCheck();//인가
@@ -44,7 +47,6 @@ function authorizationCheck() {
             }
 
             $('#nickname').text(nickname);
-            login_user = nickname;
         })
         .fail(function (jqXHR, textStatus) {
             logout();
@@ -91,7 +93,7 @@ function addPostCard() {
                     `<div onclick="showDetails('${id}')" style="transition:transform 0.3s ease-in-out" class="col" data-bs-toggle="modal" data-bs-target="#PostDetailsModal">
                      <img src="${image}" class="card-img-top" alt="..." style="object-fit:contain;height:400px;width: 100%">
                     </a>
-                    <div class="member_content">
+                    <div class="post_content" style="margin: 10px 10px 0px 10px">
                     <h5>${title}</h5>
                     <h5>${nickname}</h5>
                     <h5>${createdAt}</h5>
@@ -113,12 +115,13 @@ function addPostCard() {
 //게시글 작성
 function createPost(username) {
     let formData = new FormData();
-    console.log(imageFile);
+
     if (!imageFile) {
         formData.append('image', null);
     } else {
         formData.append('image', imageFile);
     }
+
     let title = $('#create_title').val();
     let contents = $('#create_contents').val().replace("\r\b", "<br>");//textarea에서 엔터-> <br>로 변환
 
@@ -136,12 +139,10 @@ function createPost(username) {
             contentType: false,
             processData: false,
             success: function (response) {
-                console.log(response);
                 alert(response['responseMessage']);
                 window.location.reload();
             },
             error(error, status, request) {
-                console.log(error);
                 alert(error['responseJSON']['responseMessage']);
             }
         }
@@ -154,8 +155,6 @@ function showDetails(id) {
         type: 'GET',
         url: `/api/posts/${id}`,
         success: function (response) {
-            console.log(response);
-
             let id = response['id'];
             let title = response['title'];
             let nickname = response['nickname'];
@@ -169,36 +168,66 @@ function showDetails(id) {
             $('#response_contents').text(contents);
             $('#response_nickname').text(nickname);
             $('#response_createdAt').text(createdAt);
-            $('#response_image').attr("src", image);
+            if (image === null) {
+                $('#response_image').hide();
+                $('#image_remove_btn').hide();
+            } else {
+                $('#response_image').attr("src", image);
+                $('#image_remove_btn').show().attr("disabled", false);
+            }
 
             $('#delete_btn').val(id);
             $('#update_btn').val(id);
+            $('#image_remove_btn').val(image);//기존의 이미지 정보
 
             $('#edit_title').val(title);
             $('#edit_contents').val(contents);
-            $('#edit_image').val(image);
         }
     })
     showComment(id);
 }
 
+//기존의 이미지 삭제
+function removeOriginal() {
+    $('#image_remove_btn').val(null).attr("disabled", true);
+}
+
+
 //게시물 업데이트(Save 버튼 클릭 시)
 function updatePost() {
-    let id = $('#update_btn').val();
+    let original = false;
+    let formData = new FormData();
+    var original_image = $('#image_remove_btn').val();
 
+    if (!original_image) {
+        original = false;//기존 이미지 삭제됨
+    } else {
+        original = true;//기존 이미지 유지
+    }
+
+
+    if (!updateFile) {
+        formData.append('image', null);
+    } else {
+        formData.append('image', updateFile);
+    }
+
+    let id = $('#update_btn').val();
     let title = $('#edit_title').val();
     let contents = $('#edit_contents').val().replace("\r\b", "<br>");
 
     let data = {
         'title': title,
-        'contents': contents,
+        'contents': contents
     };
-
+    console.log(original);
+    formData.append("data", new Blob([JSON.stringify(data)], {type: "application/json"}));
     $.ajax({
             type: 'PUT',
-            url: `/api/posts/${id}`,
-            contentType: 'application/json',
-            data: JSON.stringify(data),
+            url: `/api/posts/${id}/${original}`,
+            data: formData,
+            contentType: false,
+            processData: false,
             success: function (response) {
                 alert(response['responseMessage']);
                 window.location.reload();
@@ -252,7 +281,6 @@ function create_Comment() {
                 showComment(post_id);
             },
             error(error, status, request) {
-                console.log(error);
                 alert(error['responseJSON']['responseMessage']);
             }
         }

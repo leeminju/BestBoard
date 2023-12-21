@@ -1,5 +1,12 @@
+@font-face {
+    font-family: 'NanumSquareNeo-Variable';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_11-01@1.0/NanumSquareNeo-Variable.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
-    font-family: 'Georgia', serif;
+    font-family: 'NanumSquareNeo-Variable', serif;
 }
 
 body {
@@ -122,7 +129,6 @@ body {
     height: 32px;
     /*margin: 56px auto auto auto;*/
     flex-grow: 0;
-    font-family: SpoqaHanSansNeo;
     font-size: 32px;
     font-weight: bold;
     font-stretch: normal;
@@ -149,7 +155,6 @@ body {
     border: solid 1px #212529;
     background-color: #ffffff;
 
-    font-family: SpoqaHanSansNeo;
     font-size: 20px;
     font-weight: bold;
     font-stretch: normal;
@@ -174,7 +179,6 @@ body {
     padding-left: 11px;
     margin-top: 40px;
     /*margin: 0 337.9px 14px 11px;*/
-    font-family: NotoSansCJKKR;
     font-size: 16px;
     font-weight: normal;
     font-stretch: normal;
@@ -199,8 +203,6 @@ body {
     padding: 11px 12px;
     border-radius: 5px;
     background-color: orange;
-
-    font-family: SpoqaHanSansNeo;
     font-size: 20px;
     font-weight: bold;
     font-stretch: normal;
@@ -216,7 +218,6 @@ body {
     top: 48px;
     right: 110px;
     font-size: 18px;
-    font-family: SpoqaHanSansNeo;
     font-size: 18px;
     font-weight: 500;
     font-stretch: normal;
@@ -232,7 +233,6 @@ body {
     top: 48px;
     right: 50px;
     font-size: 18px;
-    font-family: SpoqaHanSansNeo;
     font-size: 18px;
     font-weight: 500;
     font-stretch: normal;

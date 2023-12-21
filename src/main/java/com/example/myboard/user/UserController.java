@@ -74,7 +74,6 @@ public class UserController {
         userService.login(userRequestDto);
 
         String token = jwtUtil.createToken(userRequestDto.getNickname());
-        System.out.println(token);
 
         return ResponseEntity.ok()
                 .header(JwtUtil.AUTHORIZATION_HEADER, token)

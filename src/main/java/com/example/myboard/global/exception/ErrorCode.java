@@ -12,6 +12,7 @@ public enum ErrorCode {
     IS_DUPLICATE_NICKNAME("중복된 닉네임입니다.", HttpStatus.BAD_REQUEST),
     NOT_EQUALS_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     NOT_CONTAINS_NICKNAME_IN_PASSWORD("비밀번호에 닉네임과 같은 값이 포함될 수 없습니다.", HttpStatus.BAD_REQUEST),
+    NOT_IMAGE_FILE("이미지 파일 형식이 아닙니다.", HttpStatus.BAD_REQUEST),
 
     //NOT_FOUND
     NOT_FOUND_USER("닉네임 또는 패스워드를 확인해 주세요!", HttpStatus.NOT_FOUND),

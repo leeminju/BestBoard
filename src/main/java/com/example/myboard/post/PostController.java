@@ -27,7 +27,7 @@ public class PostController {
             @RequestParam(value = "image", required = false) MultipartFile image,
             @RequestPart("data") @Valid PostRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        postService.createPost(requestDto, userDetails.getUser(),image);
+        postService.createPost(requestDto, userDetails.getUser(), image);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CustomResponseEntity(
                         "게시글 작성 완료",
@@ -47,11 +47,13 @@ public class PostController {
         return postService.getPostById(id);
     }
 
-    @PutMapping("/posts/{id}")
+    @PutMapping("/posts/{id}/{original}")
     public ResponseEntity<CustomResponseEntity> updatePost(@PathVariable Long id,
-                                                           @RequestBody @Valid PostRequestDto requestDto,
-                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        postService.updatePost(id, requestDto, userDetails.getUser());
+                                                           @PathVariable boolean original,
+                                                           @RequestParam(value = "image", required = false) MultipartFile image,
+                                                           @RequestPart("data") @Valid PostRequestDto requestDto,
+                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
+        postService.updatePost(id, requestDto, userDetails.getUser(),image, original);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CustomResponseEntity(
                         "게시글 수정 완료",

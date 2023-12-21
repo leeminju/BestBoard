@@ -6,13 +6,13 @@ import com.example.myboard.global.exception.RestApiException;
 import com.example.myboard.user.User;
 import com.example.myboard.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,9 @@ public class PostService {
     public PostResponseDto createPost(PostRequestDto requestDto, User user, MultipartFile image) throws IOException {
         Post post;
         if (image != null && !image.isEmpty()) {
+            if (!image.getContentType().startsWith("image")) {
+                throw new RestApiException(ErrorCode.NOT_IMAGE_FILE);
+            }
             String url = s3Uploader.upload(image, "images");
             post = postRepository.save(new Post(requestDto, user, url));
         } else {
@@ -41,36 +44,53 @@ public class PostService {
     }
 
     public PostResponseDto getPostById(Long id) {
-        Post Post = postRepository.findById(id).orElseThrow(
+        Post post = postRepository.findById(id).orElseThrow(
                 () -> new RestApiException(ErrorCode.NOT_FOUND_POST)
         );
-        return new PostResponseDto(Post);
+        return new PostResponseDto(post);
     }
 
     @Transactional
-    public PostResponseDto updatePost(Long id, PostRequestDto requestDto, User user) {
-        Post Post = postRepository.findById(id).orElseThrow(
+    public PostResponseDto updatePost(Long id, PostRequestDto requestDto, User user, MultipartFile image, boolean orginal) throws IOException {
+        Post post = postRepository.findById(id).orElseThrow(
                 () -> new RestApiException(ErrorCode.NOT_FOUND_POST)
         );
 
-        if (!Post.getUser().getId().equals(user.getId())) {
+        if (!post.getUser().getId().equals(user.getId())) {
             throw new RestApiException(ErrorCode.CAN_NOT_MODIFY_POST);
         }
 
-        Post.update(requestDto);
-        return new PostResponseDto(Post);
+        if (image == null || image.getContentType() == null) {
+            if (post.getImage() != null) {
+                if (orginal) {
+                    post.update(requestDto, post.getImage());//원래 이미지 유지
+                } else {
+                    post.update(requestDto, null);//원래 이미지 삭제
+                }
+            } else {
+                post.update(requestDto, null);
+            }
+        } else {
+            if (!image.getContentType().startsWith("image")) {
+                throw new RestApiException(ErrorCode.NOT_IMAGE_FILE);
+            }
+            String url = s3Uploader.upload(image, "images");
+            post.update(requestDto, url);
+        }
+
+        return new PostResponseDto(post);
     }
 
     public void deletePost(Long id, User user) {
-        Post Post = postRepository.findById(id).orElseThrow(
+        Post post = postRepository.findById(id).orElseThrow(
                 () -> new RestApiException(ErrorCode.NOT_FOUND_POST)
         );
 
-        if (!Post.getUser().getId().equals(user.getId())) {
+        if (!post.getUser().getId().equals(user.getId())) {
             throw new RestApiException(ErrorCode.CAN_NOT_DELETE_POST);
         }
 
-        postRepository.delete(Post);
+        postRepository.delete(post);
     }
 
 }
