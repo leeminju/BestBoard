@@ -87,7 +87,6 @@ function addPostCard() {
             pageSize: 'size'
         },
         totalNumberLocator: (response) => {
-            console.log(response);
             return response.totalElements;//전체 갯수
         },
         pageSize: 8,
@@ -116,7 +115,7 @@ function addPostCard() {
                 }
 
                 let html =
-                    `<div onclick="showDetails('${id}')" style="transition:transform 0.3s ease-in-out" class="col" data-bs-toggle="modal" data-bs-target="#PostDetailsModal">
+                    `<div id="post-card" onclick="showDetails('${id}')" style="transition:transform 0.3s ease-in-out" class="col" data-bs-toggle="modal" data-bs-target="#PostDetailsModal">
                  <img src="${image}" class="card-img-top" alt="..." style="object-fit:contain;height:400px;width: 100%">
 
                 <div class="post_content" style="margin: 10px 10px 0px 10px">
@@ -136,52 +135,6 @@ function addPostCard() {
             }
         }
     });
-
-    // $.ajax({
-    //     type: 'GET',
-    //     url: '/api/posts',
-    //     contentType: 'application/json',
-    //     success: function (response) {
-    //         for (var i = 0; i < response.length; i++) {
-    //             let post = response[i];
-    //             let id = post['id'];
-    //             let title = post['title'];
-    //             let contents = post['contents'];
-    //             let createdAt = post['createdAt'];
-    //             let nickname = post['nickname'];
-    //             let image = post['image'];
-    //             let commentCount = post['commentCount'];
-    //             let likeCount = post['likeCount'];
-    //
-    //             if (image === null) {
-    //                 image = "images/default.jpg";
-    //             }
-    //
-    //             let html =
-    //                 `<div onclick="showDetails('${id}')" style="transition:transform 0.3s ease-in-out" class="col" data-bs-toggle="modal" data-bs-target="#PostDetailsModal">
-    //              <img src="${image}" class="card-img-top" alt="..." style="object-fit:contain;height:400px;width: 100%">
-    //
-    //             <div class="post_content" style="margin: 10px 10px 0px 10px">
-    //             <div>
-    //             <button class="like_btn" id="like-btn-${id}" type="button"></button><span style="font-size: 25px;margin-left: 10px">${likeCount}</span>
-    //             </div>
-    //             <h5>${title}</h5>
-    //             <h5>댓글 ${commentCount}</h5>
-    //             <h5>${nickname}</h5>
-    //             <h5>${createdAt}</h5>
-    //             </div>
-    //            </div>`
-    //
-    //             checkLike2(id);
-    //             $('#card').append(html);
-    //
-    //         }
-    //     }
-    //     ,
-    //     error(error, status, request) {
-    //         console.log(error);
-    //     }
-    // });
 }
 
 
@@ -253,6 +206,8 @@ function showDetails(id) {
 
             $('#delete_btn').val(id);
             $('#update_btn').val(id);
+            $('#comment-pagination').val(id);
+
             $('#image_remove_btn').val(image);//기존의 이미지 정보
 
             $('#edit_title').val(title);
@@ -313,8 +268,12 @@ function likePost() {
             success: function (response) {
                 if (response) {
                     $('#like_btn').css({"background": "url(/images/full.png)"});
+                    var count = Number($('#like_count').text());
+                    $('#like_count').text(Number(count + 1));
                 } else {
                     $('#like_btn').css({"background": "url(/images/empty.png)"});
+                    var count = Number($('#like_count').text());
+                    $('#like_count').text(Number(count - 1));
                 }
 
             },
@@ -429,12 +388,44 @@ function create_Comment() {
 
 //할 일내 댓글 조회
 function showComment(post_id) {
-    $.ajax({
-        type: 'GET',
-        url: `/api/posts/${post_id}/comments`,
-        success: function (response) {
-            $('#comment-card').empty();
+    if (!post_id) {
+        post_id = $('#comment-pagination').val();
+    }
+    console.log(post_id);
 
+    let dataSource = null;
+
+    var sorting = $("#comment_sorting option:selected").val();
+    var isAsc = $(':radio[name="comment_isAsc"]:checked').val();
+
+    console.log(sorting + " " + isAsc);
+
+    dataSource = `/api/posts/${post_id}/comments?sortBy=${sorting}&isAsc=${isAsc}`;
+    console.log(dataSource);
+
+    $('#comment-card').empty();
+    $('#comment-pagination').pagination({
+        dataSource,
+        locator: 'content',
+        alias: {
+            pageNumber: 'page',
+            pageSize: 'size'
+        },
+        totalNumberLocator: (response) => {
+            console.log(response);
+            return response.totalElements;//전체 갯수
+        },
+        pageSize: 5,
+        showPrevious: true,
+        showNext: true,
+        ajax: {
+            error(error, status, request) {
+                console.log(error);
+            }
+        },
+        callback: function (response, pagination) {
+            console.log(response);
+            $('#comment-card').empty();
             for (var i = 0; i < response.length; i++) {
                 let comment = response[i];
 
@@ -470,8 +461,9 @@ function showComment(post_id) {
                 $('#comment-card').append(tempHTML);
             }
         }
-    })
+    });
 }
+
 
 //편집 버튼 누르면 -> 편집 공간 display
 function editComment(id) {

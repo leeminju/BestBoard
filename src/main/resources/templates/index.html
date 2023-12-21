@@ -83,6 +83,18 @@
                     <span id="like_count" style="font-size: 25px;margin-left: 10px"></span>
                 </div>
                 <h5>Comments</h5>
+                <div class="pagination">
+                    정렬:
+                    <select id="comment_sorting" onchange="showComment()">
+                        <option value="createdAt">작성일</option>
+                        <option value="modifiedAt">수정일</option>
+                        <option value="user.nickname">닉네임</option>
+                    </select>
+                    <input type="radio" name="comment_isAsc" value="true" onchange="showComment()" checked/> 오름차순
+                    <input type="radio" name="comment_isAsc" value="false" onchange="showComment()"/> 내림차순
+                </div>
+                <div id="comment-pagination" class="pagination"></div>
+
                 <div class="row d-flex justify-content-center">
                     <div id="commentarea" class="col-md-8 col-lg-6">
                         <div class="card shadow-0 border" style="background-color: #f0f2f5;">
