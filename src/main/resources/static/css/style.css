@@ -13,6 +13,17 @@ body {
     margin: 0px;
 }
 
+.like_btn {
+    width: 25px;
+    height: 25px;
+    object-fit: cover;
+    border: none;
+    background-color: transparent !important;
+    background-image: url("/images/empty.png");
+    transition-duration: 0.3ms;
+    transition: transform 0.3s ease-in-out;
+}
+
 .form-outline {
     padding: 10px;
 }

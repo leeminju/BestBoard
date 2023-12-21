@@ -84,6 +84,8 @@ function addPostCard() {
                 let createdAt = post['createdAt'];
                 let nickname = post['nickname'];
                 let image = post['image'];
+                let commentCount = post['commentCount'];
+                let likeCount = post['likeCount'];
 
                 if (image === null) {
                     image = "images/default.jpg";
@@ -92,14 +94,19 @@ function addPostCard() {
                 let html =
                     `<div onclick="showDetails('${id}')" style="transition:transform 0.3s ease-in-out" class="col" data-bs-toggle="modal" data-bs-target="#PostDetailsModal">
                      <img src="${image}" class="card-img-top" alt="..." style="object-fit:contain;height:400px;width: 100%">
-                    </a>
+
                     <div class="post_content" style="margin: 10px 10px 0px 10px">
+                    <div>
+                    <button class="like_btn" id="like-btn-${id}" type="button"></button><span style="font-size: 25px;margin-left: 10px">${likeCount}</span>
+                    </div>
                     <h5>${title}</h5>
+                    <h5>댓글 ${commentCount}</h5>
                     <h5>${nickname}</h5>
                     <h5>${createdAt}</h5>
                     </div> 
                    </div>`
 
+                checkLike2(id);
                 $('#card').append(html);
 
             }
@@ -151,6 +158,7 @@ function createPost(username) {
 
 //게시물 세부 내용 출력
 function showDetails(id) {
+    //게시글 내용 출력
     $.ajax({
         type: 'GET',
         url: `/api/posts/${id}`,
@@ -161,9 +169,10 @@ function showDetails(id) {
             let contents = response['contents'];
             let createdAt = response['createdAt'];
             let image = response['image'];
+            let likeCount = response['likeCount'];
 
             contents = contents.replaceAll("<br>", "\r\n");
-
+            $('#like_count').text(likeCount);
             $('#response_title').text(title);
             $('#response_contents').text(contents);
             $('#response_nickname').text(nickname);
@@ -184,8 +193,74 @@ function showDetails(id) {
             $('#edit_contents').val(contents);
         }
     })
+    checkLike(id);
     showComment(id);
 }
+
+function checkLike(id) {
+    //로그인한 유저가 좋아요 했는지 확인
+    $.ajax({
+            type: 'GET',
+            url: `/api/likes/${id}`,
+            success: function (response) {
+                if (response) {
+                    $('#like_btn').css({"background": "url(/images/full.png)"});
+                } else {
+                    $('#like_btn').css({"background": "url(/images/empty.png)"});
+                }
+
+            },
+            error(error, status, request) {
+                alert(error['responseJSON']['responseMessage']);
+            }
+
+        }
+    )
+}
+
+function checkLike2(id) {
+    //로그인한 유저가 좋아요 했는지 확인
+    $.ajax({
+            type: 'GET',
+            url: `/api/likes/${id}`,
+            success: function (response) {
+                if (response) {
+                    $(`#like-btn-${id}`).css({"background": "url(/images/full.png)"}).val(id);
+                } else {
+                    $(`#like-btn-${id}`).css({"background": "url(/images/empty.png)"}).val(id);
+                }
+
+            },
+            error(error, status, request) {
+                alert(error['responseJSON']['responseMessage']);
+            }
+
+        }
+    )
+}
+
+function likePost() {
+    let id = $('#update_btn').val();
+    $.ajax({
+            type: 'POST',
+            url: `/api/likes/${id}`,
+            success: function (response) {
+                if (response) {
+                    $('#like_btn').css({"background": "url(/images/full.png)"});
+                } else {
+                    $('#like_btn').css({"background": "url(/images/empty.png)"});
+                }
+
+            },
+            error(error, status, request) {
+                alert(error['responseJSON']['responseMessage']);
+            }
+
+        }
+    )
+}
+
+
 
 //기존의 이미지 삭제
 function removeOriginal() {

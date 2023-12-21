@@ -15,6 +15,8 @@ public class PostResponseDto {
     private String nickname;
     private String contents;
     private String image;
+    private int likeCount;
+    private int commentCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private boolean finished;
@@ -27,5 +29,7 @@ public class PostResponseDto {
         this.modifiedAt = post.getModifiedAt();
         this.nickname = post.getUser().getNickname();
         this.image = post.getImage();
+        this.likeCount = post.getLikeList().size();
+        this.commentCount = post.getCommentList().size();
     }
 }

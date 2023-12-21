@@ -3,6 +3,7 @@ package com.example.myboard.post;
 
 import com.example.myboard.comment.Comment;
 import com.example.myboard.global.entity.Timestamped;
+import com.example.myboard.like.Like;
 import com.example.myboard.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,6 +41,10 @@ public class Post extends Timestamped {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> commentList = new ArrayList<>();
 
+    //게시글 삭제되면 좋아요도 같이 삭제
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Like> likeList = new ArrayList<>();
+
     public Post(PostRequestDto requestDto, User user) {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
@@ -58,7 +63,7 @@ public class Post extends Timestamped {
         comment.addPost(this);// 외래 키(연관 관계) 설정
     }
 
-    public void update(PostRequestDto requestDto,String image) {
+    public void update(PostRequestDto requestDto, String image) {
         this.title = requestDto.getTitle();
         this.contents = requestDto.getContents();
         this.image = image;

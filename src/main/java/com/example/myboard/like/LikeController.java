@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,14 +17,18 @@ public class LikeController {
 
     //좋아요
     @PostMapping("/{post_id}")
-    public ResponseEntity<CustomResponseEntity> likePost(@PathVariable Long post_id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        likeService.likePost(post_id,userDetails.getUser());
-        return new ResponseEntity<>(
-                new CustomResponseEntity(
-                        "게시글 좋아요",
-                        HttpStatus.CREATED.value()
-                ),
-                HttpStatus.CREATED
-        );
+    public ResponseEntity<Boolean> likePost(@PathVariable Long post_id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Boolean result = likeService.likePost(post_id, userDetails.getUser());
+        if (result) {
+            return new ResponseEntity<>(result, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
+    }
+
+    //좋아요 했는지 확인
+    @GetMapping("/{post_id}")
+    public boolean getLikePost(@PathVariable Long post_id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return likeService.getLikePost(post_id, userDetails.getUser());
     }
 }
