@@ -3,11 +3,14 @@ package com.example.myboard.post;
 import com.example.myboard.global.response.CustomResponseEntity;
 import com.example.myboard.global.security.UserDetailsImpl;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +20,7 @@ import java.util.List;
 @Slf4j(topic = "post 검증")
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api")
 public class PostController {
 
@@ -36,10 +40,21 @@ public class PostController {
         );
     }
 
+    //제목 또는 내용에서 키워드 검색
+    @GetMapping("/posts/search/{keyword}")
+    public List<PostResponseDto> searchPostsByKeyword(
+            @PathVariable @Size(min = 2, max = 10, message = "2자이상 10자 이하의 검색어를 입력해주세요!")
+            String keyword) {
+        return postService.searchPostsByKeyword(keyword);
+    }
 
     @GetMapping("/posts")
-    public List<PostResponseDto> getPosts() {
-        return postService.getPosts();
+    public Page<PostResponseDto> getPosts(@RequestParam("page") int page,
+                                          @RequestParam("size") int size,
+                                          @RequestParam("sortBy") String sortBy,
+                                          @RequestParam("isAsc") boolean isAsc
+    ) {
+        return postService.getPosts(page - 1, size, sortBy, isAsc);
     }
 
     @GetMapping("/posts/{id}")
@@ -53,7 +68,7 @@ public class PostController {
                                                            @RequestParam(value = "image", required = false) MultipartFile image,
                                                            @RequestPart("data") @Valid PostRequestDto requestDto,
                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) throws IOException {
-        postService.updatePost(id, requestDto, userDetails.getUser(),image, original);
+        postService.updatePost(id, requestDto, userDetails.getUser(), image, original);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CustomResponseEntity(
                         "게시글 수정 완료",

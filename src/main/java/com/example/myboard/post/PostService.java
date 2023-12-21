@@ -6,13 +6,16 @@ import com.example.myboard.global.exception.RestApiException;
 import com.example.myboard.user.User;
 import com.example.myboard.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +41,16 @@ public class PostService {
         return new PostResponseDto(post);
     }
 
-    public List<PostResponseDto> getPosts() {
-        List<Post> posts = postRepository.findALLByOrderByCreatedAtDesc();
-        return posts.stream().map(PostResponseDto::new).toList();
+    public Page<PostResponseDto> getPosts(int page, int size, String sortBy, boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return postRepository.getPostsWithPage(pageable).map(PostResponseDto::new);
+    }
+
+    public List<PostResponseDto> searchPostsByKeyword(String keyword) {
+        return postRepository.getPostsWithKeyword(keyword).stream().map(PostResponseDto::new).toList();
     }
 
     public PostResponseDto getPostById(Long id) {
@@ -92,5 +102,6 @@ public class PostService {
 
         postRepository.delete(post);
     }
+
 
 }

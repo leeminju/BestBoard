@@ -71,11 +71,35 @@ function getToken() {
 
 //게시글 카드 추가
 function addPostCard() {
-    $.ajax({
-        type: 'GET',
-        url: '/api/posts',
-        contentType: 'application/json',
-        success: function (response) {
+    let dataSource = null;
+
+    var sorting = $("#sorting option:selected").val();
+    var isAsc = $(':radio[name="isAsc"]:checked').val();
+
+    dataSource = `/api/posts?sortBy=${sorting}&isAsc=${isAsc}`;
+
+    $('#card').empty();
+    $('#pagination').pagination({
+        dataSource,
+        locator: 'content',
+        alias: {
+            pageNumber: 'page',
+            pageSize: 'size'
+        },
+        totalNumberLocator: (response) => {
+            console.log(response);
+            return response.totalElements;//전체 갯수
+        },
+        pageSize: 8,
+        showPrevious: true,
+        showNext: true,
+        ajax: {
+            error(error, status, request) {
+                console.log(error);
+            }
+        },
+        callback: function (response, pagination) {
+            $('#card').empty();
             for (var i = 0; i < response.length; i++) {
                 let post = response[i];
                 let id = post['id'];
@@ -93,29 +117,71 @@ function addPostCard() {
 
                 let html =
                     `<div onclick="showDetails('${id}')" style="transition:transform 0.3s ease-in-out" class="col" data-bs-toggle="modal" data-bs-target="#PostDetailsModal">
-                     <img src="${image}" class="card-img-top" alt="..." style="object-fit:contain;height:400px;width: 100%">
+                 <img src="${image}" class="card-img-top" alt="..." style="object-fit:contain;height:400px;width: 100%">
 
-                    <div class="post_content" style="margin: 10px 10px 0px 10px">
-                    <div>
-                    <button class="like_btn" id="like-btn-${id}" type="button"></button><span style="font-size: 25px;margin-left: 10px">${likeCount}</span>
-                    </div>
-                    <h5>${title}</h5>
-                    <h5>댓글 ${commentCount}</h5>
-                    <h5>${nickname}</h5>
-                    <h5>${createdAt}</h5>
-                    </div> 
-                   </div>`
+                <div class="post_content" style="margin: 10px 10px 0px 10px">
+                <div>
+                <button class="like_btn" id="like-btn-${id}" type="button"></button><span style="font-size: 25px;margin-left: 10px">${likeCount}</span>
+                </div>
+                <h5>${title}</h5>
+                <h5>댓글 ${commentCount}</h5>
+                <h5>${nickname}</h5>
+                <h5>${createdAt}</h5>
+                </div>
+               </div>`
 
                 checkLike2(id);
                 $('#card').append(html);
 
             }
         }
-        ,
-        error(error, status, request) {
-            console.log(error);
-        }
     });
+
+    // $.ajax({
+    //     type: 'GET',
+    //     url: '/api/posts',
+    //     contentType: 'application/json',
+    //     success: function (response) {
+    //         for (var i = 0; i < response.length; i++) {
+    //             let post = response[i];
+    //             let id = post['id'];
+    //             let title = post['title'];
+    //             let contents = post['contents'];
+    //             let createdAt = post['createdAt'];
+    //             let nickname = post['nickname'];
+    //             let image = post['image'];
+    //             let commentCount = post['commentCount'];
+    //             let likeCount = post['likeCount'];
+    //
+    //             if (image === null) {
+    //                 image = "images/default.jpg";
+    //             }
+    //
+    //             let html =
+    //                 `<div onclick="showDetails('${id}')" style="transition:transform 0.3s ease-in-out" class="col" data-bs-toggle="modal" data-bs-target="#PostDetailsModal">
+    //              <img src="${image}" class="card-img-top" alt="..." style="object-fit:contain;height:400px;width: 100%">
+    //
+    //             <div class="post_content" style="margin: 10px 10px 0px 10px">
+    //             <div>
+    //             <button class="like_btn" id="like-btn-${id}" type="button"></button><span style="font-size: 25px;margin-left: 10px">${likeCount}</span>
+    //             </div>
+    //             <h5>${title}</h5>
+    //             <h5>댓글 ${commentCount}</h5>
+    //             <h5>${nickname}</h5>
+    //             <h5>${createdAt}</h5>
+    //             </div>
+    //            </div>`
+    //
+    //             checkLike2(id);
+    //             $('#card').append(html);
+    //
+    //         }
+    //     }
+    //     ,
+    //     error(error, status, request) {
+    //         console.log(error);
+    //     }
+    // });
 }
 
 
@@ -259,7 +325,6 @@ function likePost() {
         }
     )
 }
-
 
 
 //기존의 이미지 삭제
