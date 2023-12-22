@@ -1,7 +1,6 @@
 package com.example.myboard.global.scheduler;
 
-import com.example.myboard.post.PostRepository;
-import com.example.myboard.post.PostResponseDto;
+import com.example.myboard.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -90,8 +90,8 @@
                         <option value="modifiedAt">수정일</option>
                         <option value="user.nickname">닉네임</option>
                     </select>
-                    <input type="radio" name="comment_isAsc" value="true" onchange="showComment()" checked/> 오름차순
-                    <input type="radio" name="comment_isAsc" value="false" onchange="showComment()"/> 내림차순
+                    <input type="radio" name="comment_isAsc" value="true" onchange="showComment()"/> 오름차순
+                    <input type="radio" name="comment_isAsc" value="false" onchange="showComment()" checked/> 내림차순
                 </div>
                 <div id="comment-pagination" class="pagination"></div>
 
@@ -145,18 +145,24 @@
 </div>
 
 
-<div class="pagination">
-    정렬:
-    <select id="sorting" onchange="addPostCard()">
-        <option value="createdAt">작성일</option>
-        <option value="modifiedAt">수정일</option>
-        <option value="title">제목</option>
-        <option value="user.nickname">닉네임</option>
-    </select>
-    <input type="radio" name="isAsc" value="true" onchange="addPostCard()" checked/> 오름차순
-    <input type="radio" name="isAsc" value="false" onchange="addPostCard()"/> 내림차순
+<div style="display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px">
+    <div class="pagination">
+        정렬:
+        <select id="sorting" onchange="addPostCard()" style="margin-right: 10px">
+            <option value="createdAt">작성일</option>
+            <option value="modifiedAt">수정일</option>
+            <option value="title">제목</option>
+            <option value="user.nickname">닉네임</option>
+        </select>
+        <input type="radio" name="isAsc" value="true" onchange="addPostCard()"/> 오름차순
+        <input type="radio" name="isAsc" value="false" onchange="addPostCard()" checked/> 내림차순
+    </div>
+    <div id="pagination" class="pagination" style="margin-top:10px"></div>
 </div>
-<div id="pagination" class="pagination"></div>
 
 <div class="mycards">
     <div id="card" class="row row-cols-1 row-cols-md-4 g-4">

@@ -1,7 +1,7 @@
 package com.example.myboard.global.security;
 
 
-import com.example.myboard.user.User;
+import com.example.myboard.user.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
