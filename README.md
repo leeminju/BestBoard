@@ -3,6 +3,10 @@
 플러스 주차 복습 과제 + 심화 코드(레거시) 개선 과제를 혼합해서 진행 하였습니다!
 
 ---
+## 시연 영상
+[![캡처](https://github.com/leeminju/BestBoard/assets/19209147/ea5b4d1d-a77e-4dd3-9054-a96b73afe9d3)](https://youtu.be/I_IVhNn-vVQ)
+
+
 ## ERD 
 ![drawSQL-bestboard-export-2023-12-22](https://github.com/leeminju/BestBoard/assets/19209147/84a5cfa9-0c16-4831-97f7-f800650052d9)
 
